@@ -14,3 +14,13 @@ class Disease(Base):
     excerpt = Column(String)
     body = Column(String)
     image = Column(String)
+
+
+class Advice(Base):
+    __tablename__ = "advice"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    email = Column(String)
+    advice = Column(String)
+    created_at = Column(String)

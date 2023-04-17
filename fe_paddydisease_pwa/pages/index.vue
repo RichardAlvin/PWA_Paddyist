@@ -3,11 +3,12 @@
     <section class="predict">
       <div class="container">
         <div class="row">
-          <div class="col-12 col-sm-6">
+          <div class="col-6">
+            <NuxtLink to="/photo" class="link" style="text-decoration:none; color:black">
             <b-card no-body class="overflow-hidden" style="max-width: 540px;">
               <b-row no-gutters>
                 <b-col md="6">
-                  <b-card-img src="https://picsum.photos/400/400/?image=20" alt="Image" class="rounded-0"></b-card-img>
+                  <b-card-img src="../../img/takepicture.jpg" alt="Take_Picture" class="rounded-0"></b-card-img>
                 </b-col>
                 <b-col md="6">
                   <b-card-body title="Foto Gambar">
@@ -18,14 +19,15 @@
                 </b-col>
               </b-row>
             </b-card>
+            </NuxtLink>
           </div>
           
-          <div class="col-12 col-sm-6">
-            <NuxtLink to="/upload" class="link">
+          <div class="col-6">
+            <NuxtLink to="/upload" class="link" style="text-decoration:none; color:black">
             <b-card no-body class="overflow-hidden" style="max-width: 540px;">
               <b-row no-gutters>
                 <b-col md="6">
-                  <b-card-img src="https://picsum.photos/400/400/?image=20" alt="Image" class="rounded-0"></b-card-img>
+                  <b-card-img src="../../img/uploadphoto.jpg" alt="Upload_Photo" class="rounded-0"></b-card-img>
                 </b-col>
                 <b-col md="6">
                   <b-card-body title="Upload Gambar">
@@ -47,15 +49,18 @@
           <div class="col-12">
             <b-card no-body class="overflow-hidden">
               <b-row no-gutters>
-                <b-col md="9">
+                <b-col xs="9">
                   <b-card-body title="Foto Gambar">
                     <b-card-text>
-                      Aktifkan izin penggunaan kamera untuk mengambil gambar padi Anda.
+                      <p>Anda dapat membantu Paddyist mengembangkan penelitiannya. Caranya dengan mengirimkan beberapa gambar penyakit tanaman padi.</p>
+                      <b-button href="#" variant="primary">
+                        Upload Data
+                      </b-button>
                     </b-card-text>
                   </b-card-body>
                 </b-col>
-                <b-col md="3">
-                  <b-card-img src="https://picsum.photos/400/400/?image=20" alt="Image" class="rounded-0"></b-card-img>
+                <b-col xs="3">
+                  <b-card-img src="../../img/contribution.jpg" alt="Contribution" class="rounded-0"></b-card-img>
                 </b-col>
               </b-row>
             </b-card>
@@ -65,18 +70,26 @@
     </section>
     <section class="saran">
       <div class="container">
-        <div class="card">
-          <div class="row">
-            <div class="col-2">
-              <p>gambar</p>
-            </div>
-            <div class="col-9">
-              <h3>Paddyist perlu masukan Anda</h3>
-              <p>Kritik dan saran dari Anda sangat membantu kami agar berkembang menjadi lebih baik lagi.</p>
-            </div>
-            <div class="col-1">
-              <b-button href="/saran" variant="primary">Go</b-button>
-            </div>
+        <div class="row">
+          <div class="col-12">
+          <b-card no-body class="overflow-hidden">
+              <b-row no-gutters>
+                <b-col xs="3">
+                  <b-card-img src="../../img/saran.jpg" alt="Saran" class="rounded-0"></b-card-img>
+                </b-col>
+                <b-col xs="8">
+                  <b-card-body>
+                    <b-card-text>
+                      <h3>Paddyist perlu masukan Anda</h3>
+                      <p>Kritik dan saran dari Anda sangat membantu kami agar berkembang menjadi lebih baik lagi.</p>
+                      <b-button href="/saran" variant="primary">
+                        Berikan Saran
+                      </b-button>
+                    </b-card-text>
+                  </b-card-body>
+                </b-col>
+              </b-row>
+          </b-card>
           </div>
         </div>
       </div>
@@ -128,9 +141,10 @@ export default {
 }
 
 .saran{
-  .card{
-    padding: 6px 26px;
-    border-radius: 8px;
-  }
+  margin-bottom:20px;
+}
+
+.arrow-right{
+  height:100%;
 }
 </style>

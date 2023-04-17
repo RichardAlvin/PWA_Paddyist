@@ -1,0 +1,2 @@
+Camera Acesss in PWA Nuxt
+https://stackoverflow.com/questions/55955223/how-open-front-camera-on-android-and-ios-and-take-a-picture-working-with-vue-js

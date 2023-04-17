@@ -11,10 +11,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, File, UploadFile, File, HTTPException
 from routers import disease
+from routers import advice
 import shutil
 
 app = FastAPI()
 app.include_router(disease.router)
+app.include_router(advice.router)
 
 MODEL = tf.keras.models.load_model('paddyDisease_EfficientNetV2B0-1.h5')
 # MODEL = tf.keras.models.load_model('paddyDisease_MobileNetV3Large-1.h5')

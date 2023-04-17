@@ -18,16 +18,25 @@ def get_db():
         db.close()
 
 
-# @router.post("", status_code=status.HTTP_201_CREATED)
-# def create_todo(todo: schemas.DiseaseRequest, db: Session = Depends(get_db)):
-#     todo = crud.create_todo(db, todo)
-#     return todo
+@router.post("", status_code=status.HTTP_201_CREATED)
+def create_disease(disease: schemas.DiseaseRequest, db: Session = Depends(get_db)):
+    disease = crud.create_disease(db, disease)
+    return disease
 
 
 @router.get("", response_model=List[schemas.DiseaseResponse])
 def get_diseases(db: Session = Depends(get_db)):
     diseases = crud.read_disease(db)
     return diseases
+
+
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
+def delete_disease(id: int, db: Session = Depends(get_db)):
+    res = crud.delete_disease(db, id)
+    if res is None:
+        raise HTTPException(status_code=404, detail="Disease not found")
+    else:
+        return {"message": "Successfull Delete Disease!"}
 
 
 # @router.get("/{id}")
@@ -44,10 +53,3 @@ def get_diseases(db: Session = Depends(get_db)):
 #     if todo is None:
 #         raise HTTPException(status_code=404, detail="to do not found")
 #     return todo
-
-
-# @router.delete("/{id}", status_code=status.HTTP_200_OK)
-# def delete_todo(id: int, db: Session = Depends(get_db)):
-#     res = crud.delete_todo(db, id)
-#     if res is None:
-#         raise HTTPException(status_code=404, detail="to do not found")

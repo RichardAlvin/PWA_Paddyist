@@ -40,10 +40,6 @@ export default {
           title: 'Penyakit-Padi',
           url: '/penyakit-padi',
         },
-        {
-          title: 'Artikel',
-          url: '/artikel',
-        },
       ],
     }
   },

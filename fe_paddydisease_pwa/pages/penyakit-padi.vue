@@ -9,7 +9,7 @@
     <section>
       <div class="container">
         <div class="row">
-          <div v-for="(item,index) in dataDisease" :key="index" class="disease-box col-12 col-lg-3 col-md-4 col-sm-6">
+          <div v-for="(item,index) in dataDisease" :key="index" class="disease-box col-6 col-md-3 col-sm-4">
             <b-card
               :title="item.title"
               :img-src="item.image"
@@ -45,6 +45,7 @@ export default {
       await this.$axios.get(`${this.$apiurl()}/disease`)
       .then((res) => {
         this.dataDisease = res
+        console.log(this.dataDisease)
         // this.dataBanner = res[0].data[0]
       })
       .catch((error) => {

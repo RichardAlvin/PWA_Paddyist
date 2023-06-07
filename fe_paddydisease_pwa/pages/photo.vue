@@ -2,16 +2,29 @@
   <main class="site-main">
     <section class="upload">
       <div class="container">
-          <form class="upload-form" enctype="multipart/form-data" @submit.prevent="submit()">
-            <video autoplay></video>
-            <button class="take-photo get-access">Ambil Gambar</button>
-            <button class="predict-button">Identifikasi</button>
-          </form>
-          <div class="predict-result">
-
-          </div>
+		<form class="photo-form" enctype="multipart/form-data" @submit.prevent="submit()">
+			<div class="photo-div">
+				<button type="button" class="cam-button" :class="{ 'is-primary' : !isCameraOpen, 'is-danger' : isCameraOpen}" @click="toggleCamera">
+					<span v-if="!isCameraOpen">Open Camera</span>
+					<span v-else>Close Camera</span>
+				</button>
+				<div v-if="isCameraOpen" class="camera-box">  
+					<video id="refCamera" ref="camera" autoplay></video>
+					<canvas v-show="isPhotoTaken" id="photoTaken" ref="canvas"></canvas>
+				</div>
+				<div id="predict-result" class="predict-result mb-8">
+				<NuxtLink :to="`/penyakit-padi/${penyakit.slug}`" style="color:black"><h1 center>{{penyakit.name}}</h1></NuxtLink>
+				<!-- <NuxtLink :to="`/penyakit-padi/${penyakit.slug}`" variant="primary">Detail</NuxtLink> -->
+				</div>
+				<div v-if="isCameraOpen" class="camera-shoot">
+					<button type="button" class="button" @click="takePhoto">
+						<img src="https://img.icons8.com/material-outlined/50/000000/camera--v2.png">
+					</button>
+				</div>
+				<button class="predict-button">Identifikasi</button>
+			</div>
+		</form>
       </div>
-      <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     </section>
   </main>
 </template>
@@ -22,50 +35,126 @@ export default {
     name: 'TakePhoto',
     data() {
       return {
-        FILE: null,
+		isCameraOpen: false,
+		isPhotoTaken: false,
+		FILE: null,
+        penyakit: {
+          name: '',
+          slug: '',
+        }
       };
     },
-    mounted() {
-        // document.querySelector('#get-access').addEventListener('click', async function init(e) {
-        //     try {
-        //         const stream = await navigator.mediaDevices.getUserMedia({
-        //         audio: false,
-        //         video: true
-        //         })
-        //         const videoTracks = stream.getVideoTracks();
-        //         const track = videoTracks[0];
-        //         alert(`Getting video from: ${track.label}`);
-        //         document.querySelector('video').srcObject = stream;
-        //         document.querySelector('#get-access').setAttribute('hidden', true);
-        //     //The video stream is stopped by track.stop() after 3 second of playback.
-        //         setTimeout(() =&gt; { track.stop() }, 3 * 1000);
-        //     } catch (error) {
-        //         alert(`${error.name}`)
-        //         console.error(error)
-        //     }
-        // })
-    },
     methods: {
+		toggleCamera() {
+			if(this.isCameraOpen) {
+				this.isCameraOpen = false;
+				this.isPhotoTaken = false;
+				this.stopCameraStream();
+			} else {
+				this.isCameraOpen = true;
+				this.createCameraElement();
+			}
+		},
+
+		createCameraElement() {
+			let constraints = "";
+			constraints = (window.constraints = {
+				audio: false,
+				video: {
+					facingMode: {
+						exact: "environment",
+					}
+				}
+			});
+
+			navigator.mediaDevices
+				.getUserMedia(constraints)
+				.then(stream => {
+				this.$refs.camera.srcObject = stream;
+				})
+				// eslint-disable-next-line n/handle-callback-err
+				.catch(error => {
+				alert("Only Mobile Device that can use back camera");
+				});
+		},
+
+		stopCameraStream() {
+			// eslint-disable-next-line prefer-const
+			let tracks = this.$refs.camera.srcObject.getTracks();
+
+			tracks.forEach(track => {
+				track.stop();
+			});
+		},
+
+		takePhoto() {
+			this.isPhotoTaken = !this.isPhotoTaken;
+
+			const canvas = this.$refs.canvas;
+			const context = this.$refs.canvas.getContext('2d');
+			context.drawImage(this.$refs.camera, 0, 0, 350, 237.5);
+			this.FILE = canvas.toDataURL("image/jpg");
+		},
+
+		b64toBlob(b64Data, contentType, sliceSize= null) {
+			contentType = contentType || '';
+			sliceSize = sliceSize || 512;
+
+			const byteCharacters = atob(b64Data);
+			const byteArrays = [];
+
+			for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+				const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+				const byteNumbers = new Array(slice.length);
+				for (let i = 0; i < slice.length; i++) {
+					byteNumbers[i] = slice.charCodeAt(i);
+				}
+
+				const byteArray = new Uint8Array(byteNumbers);
+
+				byteArrays.push(byteArray);
+			}
+
+			const blob = new Blob(byteArrays, {type: contentType});
+			return blob;
+		},
+
+		async submit(){
+			try {
+				const formData = new FormData()
+				// Split the base64 string in data and contentType
+				const block = this.FILE.split(";");
+				// Get the content type of the image
+				const contentType = block[0].split(":")[1];// In this case "image/gif"
+				// get the real base64 content of the file
+				const realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
+
+				// Convert it to a blob to upload
+				const blob = this.b64toBlob(realData, contentType);
+				formData.append('file', blob,'file')
+				await this.$axios
+				.post(`${this.$apiurl()}/predictPaddy`, formData)
+				.then((res) => {
+					// eslint-disable-next-line no-console
+					console.log(res.data)
+					this.penyakit.name = res.data.name
+					this.penyakit.slug = res.data.slug
+
+					document.querySelector('#predict-result').style.display = 'block'
+				})
+			} catch (e) {
+				// eslint-disable-next-line no-console
+				console.log(e)
+			}
+		},
+
     } 
 }
 </script>
 
 <style lang="scss" scoped>
-.img-area {
-	position: relative;
-	max-width: 80%;
-  max-height: 400px;
-	background: var(--grey);
-	margin-bottom: 30px;
-	border-radius: 15px;
-	overflow: hidden;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-}
-
-.upload-form{
+.photo-div{
   display:flex;
   flex-direction: column;
   align-items: center;
@@ -73,51 +162,18 @@ export default {
   padding-top:50px;
 }
 
-.img-area .icon {
-	font-size: 100px;
+.camera-box{
+  margin: 5%;
+  position: relative;
 }
-.img-area h3 {
-	font-size: 20px;
-	font-weight: 500;
-	margin-bottom: 6px;
+
+canvas{
+	position:absolute;
+	top:0;
+	left:0;
 }
-.img-area p {
-	color: #999;
-}
-.img-area p span {
-	font-weight: 600;
-}
-.img-area .img-fluid {
-	position: absolute;
-	top: 0;
-	left: 0;
-	object-fit: cover;
-	object-position: center;
-	z-index: 100;
-}
-.img-area::before {
-	content: attr(data-img);
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, .5);
-	color: #fff;
-	font-weight: 500;
-	text-align: center;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	pointer-events: none;
-	opacity: 0;
-	transition: all .3s ease;
-	z-index: 200;
-}
-.img-area.active:hover::before {
-	opacity: 1;
-}
-.take-photo {
+
+.cam-button {
 	display: block;
 	width: 80%;
 	padding: 16px 0;
@@ -130,9 +186,7 @@ export default {
 	cursor: pointer;
 	transition: all .3s ease;
 }
-.take-photo:hover {
-	background: var(--dark-blue);
-}
+
 .predict-button{
   margin-top:10px;
   display:block;
@@ -147,7 +201,24 @@ export default {
 	cursor: pointer;
 	transition: all .3s ease;
 }
-.predict-button:hover {
-  background: var(--dark-green);
+
+.predict-result{
+	display:none;
+}
+
+#refCamera, #photoTaken{
+	width: 350px;
+	height:300px;
+}
+
+@media only screen and (max-width: 600px) {
+  h1{
+    font-size: 20px;
+  }
+
+  #refCamera, #photoTaken{
+	width: 250px;
+	height:200px;
+  }
 }
 </style>

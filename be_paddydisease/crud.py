@@ -5,16 +5,50 @@ import schemas
 
 
 def create_disease(db: Session, disease: schemas.DiseaseRequest):
-    db_disease = models.Disease(title=disease.title, slug=disease.slug, type=disease.type,
-                                excerpt=disease.excerpt, body=disease.body, image=disease.image)
+    slug = disease.title.replace(" ", "_").lower()
+    excerpt = generate_excerpt(disease.body)
+
+    # check excerpt in disease table (must unique)
+    check_slug = db.query(models.Disease).filter(
+        models.Disease.slug == slug).first()
+
+    if check_slug is not None:
+        return False
+
+    # save new disease to table
+    db_disease = models.Disease(title=disease.title, slug=slug, type=disease.type,
+                                excerpt=excerpt, body=disease.body, image=disease.image)
     db.add(db_disease)
     db.commit()
     db.refresh(db_disease)
     return db_disease
 
 
+def generate_excerpt(text, max_length=100):
+    if len(text) <= max_length:
+        return text
+    else:
+        return text[:max_length] + "..."
+
+
 def read_disease(db: Session):
     return db.query(models.Disease).all()
+
+
+def read_disease_by_slug(db: Session, slug: str):
+    return db.query(models.Disease).filter(models.Disease.slug == slug).first()
+
+
+def update_disease(db: Session, id: int, disease: schemas.DiseaseRequest):
+    db_disease = db.query(models.Disease).filter(
+        models.Disease.id == id).first()
+    if db_disease is None:
+        return None
+    db.query(models.Disease).filter(models.Disease.id == id).update(
+        {'title': disease.title, 'slug': disease.slug, 'type': disease.type, 'excerpt': disease.excerpt, 'body': disease.body, 'image': disease.image})
+    db.commit()
+    db.refresh(db_disease)
+    return db_disease
 
 
 def delete_disease(db: Session, id: int):
@@ -51,17 +85,3 @@ def delete_advice(db: Session, id: int):
         models.Advice.id == id).delete()
     db.commit()
     return True
-
-# def read_todo(db: Session, id: int):
-#     return db.query(models.Disease).filter(models.ToDo.id == id).first()
-
-
-# def update_todo(db: Session, id: int, todo: schemas.ToDoRequest):
-#     db_todo = db.query(models.ToDo).filter(models.ToDo.id == id).first()
-#     if db_todo is None:
-#         return None
-#     db.query(models.ToDo).filter(models.ToDo.id == id).update(
-#         {'name': todo.name, 'completed': todo.completed})
-#     db.commit()
-#     db.refresh(db_todo)
-#     return db_todo

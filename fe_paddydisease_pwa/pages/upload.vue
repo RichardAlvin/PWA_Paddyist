@@ -9,24 +9,13 @@
               <h3>Upload Image</h3>
               <p>Image size must be less than <span>2MB</span></p>
             </div>
-            <button class="select-image">Select Image</button>
+            <div id="predict-result" class="predict-result mb-8">
+            <NuxtLink :to="`/penyakit-padi/${penyakit.slug}`" style="color:black"><h1 center>{{penyakit.name}}</h1></NuxtLink>
+            <!-- <NuxtLink :to="`/penyakit-padi/${penyakit.slug}`" variant="primary">Detail</NuxtLink> -->
+            </div>
+            <button class="select-image">{{penyakit.name? "Try Again" : "Select Image"}}</button>
             <button class="predict-button">Identifikasi</button>
           </form>
-          <div class="predict-result">
-
-          </div>
-        <!-- <div id="app">
-            <form action=""
-            class="full-width flex flex-row relative"
-            @submit.prevent="getData()">
-            <input type="file" @change="onFileChange" />
-
-            <div id="preview">
-                <img v-if="url" :src="url" />
-            </div>
-            <button type="submit" class="btn--primary">Identifikasi</button>
-            </form>
-        </div> -->
       </div>
     </section>
   </main>
@@ -39,6 +28,10 @@ export default {
     data() {
       return {
         FILE: null,
+        penyakit: {
+          name: '',
+          slug: '',
+        },
       };
     },
     mounted() {
@@ -82,8 +75,10 @@ export default {
             await this.$axios
               .post(`${this.$apiurl()}/predictPaddy`, formData)
               .then((res) => {
-                // eslint-disable-next-line no-console
-                console.log(res)
+                this.penyakit.name = res.data.name
+                this.penyakit.slug = res.data.slug
+
+                document.querySelector('#predict-result').style.display = 'block'
               })
           } catch (e) {
             // eslint-disable-next-line no-console
@@ -100,7 +95,7 @@ export default {
 	max-width: 80%;
   max-height: 400px;
 	background: var(--grey);
-	margin-bottom: 30px;
+	margin-bottom: 10px;
 	border-radius: 15px;
 	overflow: hidden;
 	display: flex;
@@ -193,5 +188,15 @@ export default {
 }
 .predict-button:hover {
   background: var(--dark-green);
+}
+
+.predict-result{
+  display:none;
+}
+
+@media only screen and (max-width: 600px) {
+  h1{
+    font-size: 20px;
+  }
 }
 </style>

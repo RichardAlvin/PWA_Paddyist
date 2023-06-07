@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Text
 # Disease
 
 
 class DiseaseRequest(BaseModel):
     title: str
-    slug: str
     type: str
-    excerpt: str
-    body: str
+    body: Text
     image: str
 
 
@@ -17,7 +16,7 @@ class DiseaseResponse(BaseModel):
     slug: str
     type: str
     excerpt: str
-    body: str
+    body: Text
     image: str
 
     class Config:
@@ -39,3 +38,9 @@ class AdviceResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+# Predict
+class PredictResponse(BaseModel):
+    name: str
+    slug: str

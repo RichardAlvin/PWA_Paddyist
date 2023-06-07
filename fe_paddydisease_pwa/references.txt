@@ -1,2 +1,7 @@
 Camera Acesss in PWA Nuxt
 https://stackoverflow.com/questions/55955223/how-open-front-camera-on-android-and-ios-and-take-a-picture-working-with-vue-js
+
+Coba ini harusnya bisa
+https://codepen.io/aquilesb/pen/mZYpem
+
+https://dev.to/ditarahma08/make-a-camera-app-in-web-part-2-capturing-the-image-289i

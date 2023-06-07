@@ -10,9 +10,10 @@
       <div class="container">
         <div class="row">
           <div v-for="(item,index) in dataDisease" :key="index" class="disease-box col-6 col-md-3 col-sm-4">
+            <NuxtLink :to="`/penyakit-padi/${item.slug}`" style="text-decoration:none; color:black">
             <b-card
               :title="item.title"
-              :img-src="item.image"
+              :img-src="`../../img/paddy-disease/${item.image}.jpg`"
               img-alt="Image"
               img-top
               tag="article"
@@ -22,9 +23,8 @@
               <b-card-text>
                 {{ item.excerpt }}
               </b-card-text>
-
-              <NuxtLink to="/detail" variant="primary">Detail</NuxtLink>
             </b-card>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -44,9 +44,7 @@ export default {
   async fetch() {
       await this.$axios.get(`${this.$apiurl()}/disease`)
       .then((res) => {
-        this.dataDisease = res
-        console.log(this.dataDisease)
-        // this.dataBanner = res[0].data[0]
+        this.dataDisease = res.data
       })
       .catch((error) => {
         // eslint-disable-next-line no-console

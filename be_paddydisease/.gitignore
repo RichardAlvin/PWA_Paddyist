@@ -1,5 +1,4 @@
 .env
 __pycache__
 references.txt
-paddyDisease_EfficientNetV2B0-1.h5
-paddyDisease_MobileNetV3Large-1.h5
+models

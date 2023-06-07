@@ -86,7 +86,7 @@ export default {
 
   pwa: {
     icon: {
-      fileName: 'icon.png',
+      fileName: 'icon-small.png',
       size: [64, 120, 144, 152],
     },
     manifest: {

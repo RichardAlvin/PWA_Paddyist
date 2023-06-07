@@ -3,6 +3,18 @@
     <section class="saran">
       <div class="container">
           <div>
+            <div
+              v-if="!showForm && resetSuccess"
+              class="success-alert flex flex-col p-16 text-center v-center h-center"
+            >
+              <i class="i-check-circle mr-8 f-64 text-green"></i
+              ><span class="mt-16"
+                >Terima kasih atas Saran yang diberikan ^-^</span
+              >
+              <nuxt-link to="/" class="btn btn--green mt-16"
+                >Kembali ke Beranda</nuxt-link
+              >
+            </div>
             <h3>Saran dan Kritik</h3>
             <b-form v-if="show" @submit="onSubmit" @reset="onReset">
               <b-form-group
@@ -32,7 +44,7 @@
               <b-form-group id="input-group-3" label="Saran Anda:" label-for="input-2">
                 <b-form-textarea
                 id="input-3"
-                v-model="form.saran"
+                v-model="form.advice"
                 placeholder="Masukkan Saran Anda"
                 required
                 ></b-form-textarea>
@@ -54,15 +66,38 @@ export default {
         form: {
           email: '',
           name: '',
-          saran: ''
+          advice: ''
         },
+        resetSuccess: false,
+        showForm: true,
         show: true
       }
     },
     methods: {
-      onSubmit(event) {
+      async onSubmit(event) {
         event.preventDefault()
-        alert(JSON.stringify(this.form))
+        try {
+          const res = await this.$axios.post(
+            `${this.$apiurl()}/advice`,
+            this.form
+          )
+          if (res.status === 201) {
+            this.resetSuccess = true
+            this.showForm = false
+            this.form.email = ''
+            this.form.name = ''
+            this.form.advice = ''
+          }
+        } catch (error) {
+          let errMessage = error.response.data?.message || error.message
+          if (errMessage === 'Bad Request')
+            errMessage = error.response.data.validator.email[0]
+          this.alertMessage = errMessage
+          this.showAlert = true
+          // eslint-disable-next-line no-console
+          console.log(error)
+        }
+        // alert(JSON.stringify(this.form))
       },
       onReset(event) {
         event.preventDefault()

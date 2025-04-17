@@ -26,7 +26,7 @@ app.include_router(advice.router)
 
 # PreTrained import model
 model = tf.keras.models.load_model(
-    'models/PaddyDisease_EfficientNetV2B0_OverSampling_256.h5', compile=False)
+    'models/PaddyDisease_MobileNetV3Large_OverSampling_256_v2.h5', compile=False)
 
 origins = ["*"]
 
